@@ -27,7 +27,16 @@ module.exports = ({ dir, file, port = 3000, verbose, nodeArgs }) => {
     stats: verbose ? "verbose" : "errors-only",
     clientLogLevel: verbose ? "info" : "error",
     watchOptions: { ignored: [/node_modules/] },
-    ...spawnedServer.devServerConfig
+    ...spawnedServer.devServerConfig,
+    // TODO: remove proxy. it is defined by spawnedServer.devServerConfig,
+    // but the address format it uses http://[::1]
+    // doesn't seem to be supported by travis ci
+    proxy: {
+      "**": {
+        target: true,
+        router: () => "http://127.0.0.1:" + spawnedServer.address.port
+      }
+    }
   });
 
   server.listen(port);
