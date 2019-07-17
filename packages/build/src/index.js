@@ -15,6 +15,7 @@ const { useAppModuleOrFallback, getRouterCode } = require("./util");
 
 const HASH = "[hash:10]";
 const SERVER_FILE = path.join(__dirname, "./files/server.js");
+const MIDDLEWARE_FILE = path.join(__dirname, "./files/middleware.js");
 const CWD = process.cwd();
 
 module.exports = ({
@@ -164,13 +165,16 @@ module.exports = ({
   const serverConfig = {
     name: "Server",
     target: "async-node",
-    entry: SERVER_FILE,
+    entry: {
+      index: SERVER_FILE,
+      middleware: MIDDLEWARE_FILE
+    },
     cache: false,
     output: {
       pathinfo: true,
       path: BUILD_PATH,
       publicPath: PUBLIC_PATH,
-      filename: "index.js",
+      filename: "[name].js",
       chunkFilename: `[name].${HASH}.js`,
       libraryTarget: "commonjs2"
     },

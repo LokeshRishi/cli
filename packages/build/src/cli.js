@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const build = require("./");
+const { buildStaticSite } = require("./util");
 const parseNodeArgs = require("parse-node-args");
 
 exports.parse = function parse(argv) {
@@ -22,6 +23,10 @@ exports.parse = function parse(argv) {
       "--json": {
         type: "boolean",
         description: "Print a JSON stats object for analysis tools"
+      },
+      "--static": {
+        type: "boolean",
+        description: "Build a static HTML site"
       }
     })
     .usage("$0 build <path> [options]")
@@ -71,8 +76,10 @@ exports.parse = function parse(argv) {
 };
 
 exports.run = async options => {
-  build(options).run((err, stats) => {
+  build(options).run(async (err, stats) => {
     if (err) console.error(err);
-    console.log(stats.toString());
+    if (options.static) {
+      await buildStaticSite(options, stats);
+    }
   });
 };

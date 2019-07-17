@@ -5,6 +5,7 @@ import cluster from "cluster";
 import { copy, remove } from "fs-extra";
 import { run } from "../src/cli";
 import build from "../../build/src/index";
+import { buildStaticSite } from "../../build/src/util";
 
 describe("scope(serve)", function() {
   this.slow(20000);
@@ -32,6 +33,30 @@ describe("scope(serve)", function() {
 
       await new Promise(resolve => {
         server = cluster.fork({ ...process.env, PORT: options.port });
+        server.once("listening", resolve);
+      });
+
+      return () =>
+        new Promise(resolve => {
+          server.on("exit", resolve);
+          server.kill();
+        });
+    }),
+    static: createTest(async (options, { resolve }) => {
+      const outputPath = resolve("dist");
+      await buildStaticSite({ ...options, output: outputPath });
+      const serveExecutable = require.resolve(".bin/serve");
+
+      cluster.setupMaster({
+        exec: serveExecutable,
+        execArgv: [],
+        args: [outputPath, "--listen", String(options.port), "--no-clipboard"]
+      });
+
+      let server;
+
+      await new Promise(resolve => {
+        server = cluster.fork();
         server.once("listening", resolve);
       });
 
@@ -95,7 +120,7 @@ function createTest(createServer) {
             screenshot,
             snapshot,
             targetPath,
-            isBuild: mode === "build"
+            isBuild: mode === "build" || mode === "static"
           });
         }
       } finally {

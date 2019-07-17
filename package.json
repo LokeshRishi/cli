@@ -24,7 +24,8 @@
     "mocha-autotest": "^1.0.2",
     "nyc": "^14.1.1",
     "prettier": "^1.17.1",
-    "puppeteer": "^1.18.1"
+    "puppeteer": "^1.18.1",
+    "serve": "^11.1.0"
   },
   "husky": {
     "hooks": {

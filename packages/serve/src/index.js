@@ -4,7 +4,10 @@ const FriendlyErrorPlugin = require("friendly-errors-webpack-plugin");
 const build = require("@marko/build");
 
 module.exports = ({ dir, file, port = 3000, verbose, nodeArgs }) => {
-  const spawnedServer = new SpawnServerPlugin({ args: nodeArgs });
+  const spawnedServer = new SpawnServerPlugin({
+    args: nodeArgs,
+    mainEntry: "index"
+  });
   const clientPlugins = [];
   const serverPlugins = [spawnedServer];
 
